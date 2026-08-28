@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Virtual Rakhi</title>
 
@@ -11,18 +10,18 @@
   body {
     margin: 0;
     background: black;
+    overflow: hidden;
     font-family: Arial, sans-serif;
-    color: white;
   }
 
-  #camera {
+  video {
     width: 100vw;
     height: 100vh;
     object-fit: cover;
     display: block;
   }
 
-  #canvas {
+  canvas {
     position: fixed;
     top: 0;
     left: 0;
@@ -31,24 +30,17 @@
     pointer-events: none;
   }
 
-  #message {
+  #text {
     position: fixed;
-    bottom: 30px;
+    top: 30px;
     left: 20px;
     right: 20px;
-    text-align: center;
-    background: rgba(120, 0, 60, 0.85);
-    padding: 15px;
-    border-radius: 15px;
-    display: none;
-  }
-
-  #status {
-    position: fixed;
-    top: 20px;
-    width: 100%;
-    text-align: center;
     z-index: 10;
+    text-align: center;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 0 2px 5px black;
   }
 </style>
 
@@ -56,17 +48,11 @@
 
 <body>
 
-<div id="status">Starting camera...</div>
+<div id="text">✋ Show me your hand</div>
 
 <video id="camera" autoplay playsinline muted></video> <canvas id="canvas"></canvas>
 
-<div id="message">
-  ❤️ I'm new to this Rakhi concept, but you've been my bro before I knew the concept.
-  <br>
-  🎉 Happy Raksha Bandhan! 🎉
-</div>
-
-<!-- Hand detection library -->
+<!-- MediaPipe Hands -->
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 
@@ -75,117 +61,53 @@
 const video = document.getElementById("camera");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-
-const status = document.getElementById("status");
-const message = document.getElementById("message");
-
-let spoken = false;
+const text = document.getElementById("text");
 
 
-/* START CAMERA */
+// Load Rakhi image
+const rakhi = new Image();
+rakhi.src = "rakhi.png";
 
-async function startCamera() {
 
-  try {
+// Start BACK camera
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: "user"
-      }
-    });
+navigator.mediaDevices.getUserMedia({
+  video: {
+    facingMode: {
+      exact: "environment"
+    }
+  },
+  audio: false
+})
 
-    video.srcObject = stream;
+.then(stream => {
 
-    await video.play();
+  video.srcObject = stream;
 
-    status.innerHTML = "📷 Camera ON — Show your hand";
+  video.onloadedmetadata = () => {
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
     detect();
 
-  } catch (error) {
+  };
 
-    status.innerHTML =
-      "Camera permission failed: " + error.message;
+})
 
-  }
+.catch(error => {
 
-}
+  text.innerHTML =
+    "Camera error: " + error.message;
 
-
-/* DRAW RAKHI */
-
-function drawRakhi(x, y, angle) {
-
-  const size = 80;
-
-  ctx.save();
-
-  ctx.translate(x, y);
-
-  ctx.rotate(angle);
+});
 
 
-  // Rakhi thread
-
-  ctx.beginPath();
-
-  ctx.moveTo(-size, 0);
-  ctx.lineTo(size, 0);
-
-  ctx.lineWidth = 12;
-
-  ctx.strokeStyle = "#d40030";
-
-  ctx.stroke();
-
-
-  // Golden center
-
-  ctx.beginPath();
-
-  ctx.arc(0, 0, 28, 0, Math.PI * 2);
-
-  ctx.fillStyle = "gold";
-
-  ctx.fill();
-
-
-  // Red center
-
-  ctx.beginPath();
-
-  ctx.arc(0, 0, 18, 0, Math.PI * 2);
-
-  ctx.fillStyle = "red";
-
-  ctx.fill();
-
-
-  // White jewel
-
-  ctx.beginPath();
-
-  ctx.arc(0, 0, 7, 0, Math.PI * 2);
-
-  ctx.fillStyle = "white";
-
-  ctx.fill();
-
-
-  ctx.restore();
-
-}
-
-
-/* HAND DETECTION */
+// MediaPipe Hand Detection
 
 const hands = new Hands({
 
-  locateFile: (file) =>
-
+  locateFile: file =>
     "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" + file
 
 });
@@ -204,9 +126,9 @@ hands.setOptions({
 });
 
 
-hands.onResults(results => {
+// When hand is detected
 
-  // Clear previous Rakhi
+hands.onResults(results => {
 
   ctx.clearRect(
     0,
@@ -225,14 +147,19 @@ hands.onResults(results => {
       results.multiHandLandmarks[0];
 
 
-    // Wrist = point 0
-    // Palm = point 9
+    // Wrist landmark
 
-    const wrist = hand[0];
-    const palm = hand[9];
+    const wrist =
+      hand[0];
 
 
-    // Convert to screen position
+    // Palm landmark
+
+    const palm =
+      hand[9];
+
+
+    // Convert wrist position
 
     const x =
       wrist.x * canvas.width;
@@ -241,7 +168,7 @@ hands.onResults(results => {
       wrist.y * canvas.height;
 
 
-    // Calculate rotation
+    // Palm position
 
     const palmX =
       palm.x * canvas.width;
@@ -249,6 +176,8 @@ hands.onResults(results => {
     const palmY =
       palm.y * canvas.height;
 
+
+    // Rotate Rakhi with hand
 
     const angle =
       Math.atan2(
@@ -259,44 +188,47 @@ hands.onResults(results => {
 
     // Draw Rakhi
 
-    drawRakhi(x, y, angle);
+    if (rakhi.complete) {
+
+      ctx.save();
+
+      ctx.translate(x, y);
+
+      ctx.rotate(angle);
 
 
-    // Show message
-
-    message.style.display =
-      "block";
-
-
-    status.innerHTML =
-      "🎀 Rakhi detected on your wrist!";
+      const size =
+        Math.min(
+          canvas.width,
+          canvas.height
+        ) * 0.3;
 
 
-    // Speak once
-
-    if (!spoken) {
-
-      spoken = true;
-
-      const speech =
-        new SpeechSynthesisUtterance(
-
-          "I'm new to this Rakhi concept, but you've been my bro before I knew the concept. Happy Raksha Bandhan!"
-
-        );
-
-      window.speechSynthesis.speak(
-        speech
+      ctx.drawImage(
+        rakhi,
+        -size / 2,
+        -size / 2,
+        size,
+        size
       );
 
+
+      ctx.restore();
+
     }
+
+
+    // Change text after hand is detected
+
+    text.innerHTML =
+      "I'm new to this Rakhi concept, but you've been my bro before I knew the concept.<br>🎉 Happy Raksha Bandhan! 🎉";
 
   }
 
 });
 
 
-/* DETECTION LOOP */
+// Detection loop
 
 async function detect() {
 
@@ -311,11 +243,6 @@ async function detect() {
   requestAnimationFrame(detect);
 
 }
-
-
-/* START */
-
-startCamera();
 
 </script>
 
