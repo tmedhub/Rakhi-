@@ -1,103 +1,123 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Virtual Rakhi</title>
 
 <style>
-  * {
-    box-sizing: border-box;
-  }
-
   body {
     margin: 0;
-    overflow: hidden;
     background: black;
     font-family: Arial, sans-serif;
+    overflow: hidden;
   }
 
-  /* Camera */
   #camera {
-    position: fixed;
-    top: 0;
-    left: 0;
     width: 100vw;
     height: 100vh;
     object-fit: cover;
-    background: black;
+    display: block;
   }
 
-  /* Rakhi overlay */
   #canvas {
     position: fixed;
     top: 0;
     left: 0;
+
     width: 100vw;
     height: 100vh;
+
     pointer-events: none;
   }
 
-  /* Main message */
   #message {
     position: fixed;
-    top: 25px;
+    top: 30px;
     left: 50%;
     transform: translateX(-50%);
+
     width: 90%;
     max-width: 700px;
 
     text-align: center;
-    padding: 15px 20px;
+
+    padding: 16px 20px;
 
     border-radius: 20px;
 
-    background: rgba(55, 0, 55, 0.75);
+    background: rgba(45, 0, 45, 0.75);
 
     color: white;
 
-    font-size: clamp(18px, 5vw, 28px);
+    font-size: clamp(20px, 5vw, 30px);
     font-weight: bold;
-    line-height: 1.4;
 
-    z-index: 10;
+    line-height: 1.4;
 
     text-shadow: 2px 2px 5px black;
 
-    box-shadow: 0 0 20px rgba(255, 190, 0, 0.8);
+    z-index: 10;
   }
 
-  /* Happy Raksha Bandhan highlight */
   .highlight {
     display: block;
     margin-top: 8px;
+
     color: #ffd700;
-    font-size: 1.15em;
+
+    font-size: 1.2em;
+
     text-shadow:
       0 0 10px #ff0000,
       0 0 20px #ff9900;
   }
 
-  /* Status at bottom */
+  #startButton {
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    z-index: 100;
+
+    padding: 18px 35px;
+
+    border: none;
+    border-radius: 30px;
+
+    background: #ffd700;
+
+    color: #4a0030;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    cursor: pointer;
+  }
+
   #status {
     position: fixed;
+
     bottom: 25px;
     left: 50%;
+
     transform: translateX(-50%);
 
     background: rgba(0, 0, 0, 0.65);
+
     color: white;
 
     padding: 10px 20px;
+
     border-radius: 30px;
 
     font-size: 16px;
 
     z-index: 10;
-
-    white-space: nowrap;
   }
 </style>
 
@@ -105,27 +125,23 @@
 
 <body>
 
-<!-- Top text -->
-
 <div id="message">
   ✋ Show me your hand
 </div>
 
-<!-- Bottom status -->
+<button id="startButton">
+  📷 Start Camera
+</button>
 
 <div id="status">
-  📷 Starting back camera...
+  Tap Start Camera to begin
 </div>
-
-<!-- Camera -->
 
 <video
 id="camera"
 autoplay
 playsinline
 muted> </video>
-
-<!-- Rakhi overlay -->
 
 <canvas id="canvas"></canvas>
 
@@ -135,134 +151,57 @@ muted> </video>
 
 <script>
 
-const video = document.getElementById("camera");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
 
-const message = document.getElementById("message");
-const status = document.getElementById("status");
+const video =
+  document.getElementById("camera");
 
+const canvas =
+  document.getElementById("canvas");
 
-/* Load Rakhi image */
+const ctx =
+  canvas.getContext("2d");
 
-const rakhi = new Image();
-rakhi.src = "rakhi.png";
+const message =
+  document.getElementById("message");
 
+const status =
+  document.getElementById("status");
 
-/* Start back camera */
-
-async function startCamera() {
-
-  try {
-
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: {
-          ideal: "environment"
-        }
-      },
-      audio: false
-    });
+const startButton =
+  document.getElementById("startButton");
 
 
-    video.srcObject = stream;
 
-    await video.play();
+/*
+LOAD RAKHI IMAGE
+*/
 
+const rakhi =
+  new Image();
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-
-    status.innerHTML = "✋ Show your hand to the camera";
-
-
-    detect();
-
-  }
-
-  catch (error) {
-
-    console.error(error);
-
-    status.innerHTML =
-      "❌ Please allow camera permission";
-
-  }
-
-}
+rakhi.src =
+  "rakhi.png";
 
 
-/* Draw Rakhi */
 
-function drawRakhi(x, y, angle) {
+/*
+MEDIAPIPE HAND DETECTION
+*/
 
-  ctx.clearRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
+const hands =
+  new Hands({
 
+    locateFile: file =>
+      "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" + file
 
-  ctx.save();
-
-
-  /* Move to wrist */
-
-  ctx.translate(x, y);
-
-
-  /*
-  Rotate with hand
-  + Math.PI = 180 degrees
-  */
-
-  ctx.rotate(angle + Math.PI);
-
-
-  /* Rakhi size */
-
-  const size =
-    Math.min(canvas.width, canvas.height) * 0.32;
-
-
-  /* Draw Rakhi */
-
-  ctx.drawImage(
-    rakhi,
-    -size / 2,
-    -size / 2,
-    size,
-    size
-  );
-
-
-  ctx.restore();
-
-}
-
-
-/* Setup MediaPipe */
-
-const hands = new Hands({
-
-  locateFile: function(file) {
-
-    return
-      "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" +
-      file;
-
-  }
-
-});
+  });
 
 
 hands.setOptions({
 
   maxNumHands: 1,
 
-  modelComplexity: 1,
+  modelComplexity: 0,
 
   minDetectionConfidence: 0.6,
 
@@ -271,9 +210,12 @@ hands.setOptions({
 });
 
 
-/* When hand is detected */
 
-hands.onResults(function(results) {
+/*
+WHEN HAND IS DETECTED
+*/
+
+hands.onResults(results => {
 
 
   ctx.clearRect(
@@ -285,27 +227,30 @@ hands.onResults(function(results) {
 
 
   if (
+
     results.multiHandLandmarks &&
+
     results.multiHandLandmarks.length > 0
+
   ) {
+
 
     const hand =
       results.multiHandLandmarks[0];
 
 
-    /* Wrist */
+    // Wrist
 
     const wrist =
       hand[0];
 
 
-    /* Palm */
+    // Palm
 
     const palm =
       hand[9];
 
 
-    /* Convert wrist coordinates */
 
     const wristX =
       wrist.x * canvas.width;
@@ -314,7 +259,6 @@ hands.onResults(function(results) {
       wrist.y * canvas.height;
 
 
-    /* Convert palm coordinates */
 
     const palmX =
       palm.x * canvas.width;
@@ -323,38 +267,95 @@ hands.onResults(function(results) {
       palm.y * canvas.height;
 
 
-    /* Calculate hand direction */
+
+    /*
+    Calculate hand direction
+    */
 
     const angle =
       Math.atan2(
+
         palmY - wristY,
+
         palmX - wristX
+
       );
 
 
-    /* Draw Rakhi */
+
+    /*
+    DRAW RAKHI
+    */
 
     if (
+
       rakhi.complete &&
+
       rakhi.naturalWidth > 0
+
     ) {
 
-      drawRakhi(
+
+      ctx.save();
+
+
+      ctx.translate(
         wristX,
-        wristY,
-        angle
+        wristY
       );
+
+
+      /*
+      180 DEGREE ROTATION
+      */
+
+      ctx.rotate(
+        angle + Math.PI
+      );
+
+
+      const size =
+        Math.min(
+          canvas.width,
+          canvas.height
+        ) * 0.3;
+
+
+      ctx.drawImage(
+
+        rakhi,
+
+        -size / 2,
+
+        -size / 2,
+
+        size,
+
+        size
+
+      );
+
+
+      ctx.restore();
 
     }
 
 
-    /* Display greeting */
+
+    /*
+    SHOW GREETING
+    */
 
     message.innerHTML =
+
       "❤️ I'm new to this Rakhi concept,<br>" +
+
       "but you've been my bro before I knew the concept." +
+
       "<span class='highlight'>" +
+
       "🎉 Happy Raksha Bandhan! 🎉" +
+
       "</span>";
 
 
@@ -363,9 +364,9 @@ hands.onResults(function(results) {
 
   }
 
+
   else {
 
-    /* No hand detected */
 
     message.innerHTML =
       "✋ Show me your hand";
@@ -379,39 +380,125 @@ hands.onResults(function(results) {
 });
 
 
-/* Detection loop */
+
+/*
+HAND DETECTION LOOP
+*/
 
 async function detect() {
 
-  if (video.readyState >= 2) {
+
+  if (
+    video.readyState >= 2
+  ) {
 
     await hands.send({
+
       image: video
+
     });
 
   }
 
-  requestAnimationFrame(detect);
+
+  requestAnimationFrame(
+    detect
+  );
 
 }
 
 
-/* Start application */
 
-startCamera();
+/*
+START CAMERA ONLY AFTER
+USER CLICKS THE BUTTON
+*/
+
+startButton.addEventListener(
+  "click",
+
+  async () => {
+
+    try {
 
 
-/* Adjust canvas if screen changes */
+      /*
+      THIS TRIGGERS THE
+      BROWSER CAMERA PERMISSION
+      POPUP
+      */
 
-window.addEventListener("resize", function() {
+      const stream =
+        await navigator.mediaDevices.getUserMedia({
 
-  canvas.width =
-    video.videoWidth;
+          video: {
 
-  canvas.height =
-    video.videoHeight;
+            facingMode: {
+              ideal: "environment"
+            }
 
-});
+          },
+
+          audio: false
+
+        });
+
+
+
+      video.srcObject =
+        stream;
+
+
+      await video.play();
+
+
+
+      canvas.width =
+        video.videoWidth;
+
+      canvas.height =
+        video.videoHeight;
+
+
+
+      /*
+      HIDE BUTTON AFTER
+      CAMERA STARTS
+      */
+
+      startButton.style.display =
+        "none";
+
+
+      status.innerHTML =
+        "✋ Show your hand";
+
+
+
+      /*
+      START HAND DETECTION
+      */
+
+      detect();
+
+
+    }
+
+    catch (error) {
+
+
+      console.error(error);
+
+
+      status.innerHTML =
+        "❌ Camera permission was denied";
+
+    }
+
+  }
+
+);
+
 
 </script>
 
