@@ -3,176 +3,121 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="viewport"
-   content="width=device-width, initial-scale=1.0">
-
-<title>Happy Raksha Bandhan ❤️</title>
+<title>Virtual Rakhi</title>
 
 <style>
+  * {
+    box-sizing: border-box;
+  }
 
-* {
-  box-sizing: border-box;
-}
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
+    font-family: Arial, sans-serif;
+  }
 
-body {
-  margin: 0;
-  overflow: hidden;
-  background: black;
-  font-family: Arial, sans-serif;
-}
+  /* Camera */
+  #camera {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    background: black;
+  }
 
+  /* Rakhi overlay */
+  #canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+  }
 
-/* CAMERA */
+  /* Main message */
+  #message {
+    position: fixed;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 700px;
 
-#camera {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
+    text-align: center;
+    padding: 15px 20px;
 
-  top: 0;
-  left: 0;
+    border-radius: 20px;
 
-  object-fit: cover;
+    background: rgba(55, 0, 55, 0.75);
 
-  background: black;
-}
+    color: white;
 
+    font-size: clamp(18px, 5vw, 28px);
+    font-weight: bold;
+    line-height: 1.4;
 
-/* RAKHI OVERLAY */
+    z-index: 10;
 
-#canvas {
-  position: fixed;
+    text-shadow: 2px 2px 5px black;
 
-  top: 0;
-  left: 0;
+    box-shadow: 0 0 20px rgba(255, 190, 0, 0.8);
+  }
 
-  width: 100vw;
-  height: 100vh;
+  /* Happy Raksha Bandhan highlight */
+  .highlight {
+    display: block;
+    margin-top: 8px;
+    color: #ffd700;
+    font-size: 1.15em;
+    text-shadow:
+      0 0 10px #ff0000,
+      0 0 20px #ff9900;
+  }
 
-  pointer-events: none;
-}
+  /* Status at bottom */
+  #status {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
 
+    background: rgba(0, 0, 0, 0.65);
+    color: white;
 
-/* TOP MESSAGE */
+    padding: 10px 20px;
+    border-radius: 30px;
 
-#message {
+    font-size: 16px;
 
-  position: fixed;
+    z-index: 10;
 
-  top: 30px;
-
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  width: 90%;
-
-  max-width: 700px;
-
-  text-align: center;
-
-  padding: 16px 20px;
-
-  border-radius: 20px;
-
-  background:
-    rgba(45, 0, 45, 0.70);
-
-  color: #ffffff;
-
-  font-size:
-    clamp(20px, 5vw, 30px);
-
-  font-weight: bold;
-
-  line-height: 1.4;
-
-  z-index: 10;
-
-  text-shadow:
-    2px 2px 5px black;
-
-  box-shadow:
-    0 0 20px
-    rgba(255, 190, 0, 0.8);
-
-}
-
-
-/* HIGHLIGHT HAPPY RAKSHA BANDHAN */
-
-.highlight {
-
-  display: block;
-
-  margin-top: 8px;
-
-  color: #ffd700;
-
-  font-size: 1.2em;
-
-  text-shadow:
-
-    0 0 10px #ff0000,
-
-    0 0 20px #ff9900;
-
-}
-
-
-/* CAMERA STATUS */
-
-#status {
-
-  position: fixed;
-
-  bottom: 25px;
-
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  background:
-    rgba(0, 0, 0, 0.65);
-
-  color: white;
-
-  padding: 12px 20px;
-
-  border-radius: 30px;
-
-  font-size: 17px;
-
-  z-index: 10;
-
-  white-space: nowrap;
-
-}
-
+    white-space: nowrap;
+  }
 </style>
 
 </head>
 
 <body>
 
-<!-- MESSAGE -->
+<!-- Top text -->
 
 <div id="message">
-
-✋ Show me your hand
-
+  ✋ Show me your hand
 </div>
 
-<!-- STATUS -->
+<!-- Bottom status -->
 
 <div id="status">
-
-📷 Starting back camera...
-
+  📷 Starting back camera...
 </div>
 
-<!-- CAMERA -->
+<!-- Camera -->
 
 <video
 id="camera"
@@ -180,110 +125,65 @@ autoplay
 playsinline
 muted> </video>
 
-<!-- RAKHI OVERLAY -->
+<!-- Rakhi overlay -->
 
-<canvas
-id="canvas"> </canvas>
+<canvas id="canvas"></canvas>
 
-<!-- MEDIAPIPE -->
+<!-- MediaPipe Hands -->
 
-<script
-src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 
 <script>
 
+const video = document.getElementById("camera");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-/*
-========================================
-GET ELEMENTS
-========================================
-*/
-
-const video =
-  document.getElementById("camera");
-
-const canvas =
-  document.getElementById("canvas");
-
-const ctx =
-  canvas.getContext("2d");
-
-const message =
-  document.getElementById("message");
-
-const status =
-  document.getElementById("status");
+const message = document.getElementById("message");
+const status = document.getElementById("status");
 
 
-/*
-========================================
-LOAD RAKHI IMAGE
-========================================
-*/
+/* Load Rakhi image */
 
-const rakhi =
-  new Image();
-
-rakhi.src =
-  "rakhi.png";
+const rakhi = new Image();
+rakhi.src = "rakhi.png";
 
 
-/*
-========================================
-START BACK CAMERA
-========================================
-*/
+/* Start back camera */
 
 async function startCamera() {
 
   try {
 
-    const stream =
-      await navigator
-        .mediaDevices
-        .getUserMedia({
-
-          video: {
-
-            facingMode: {
-              ideal: "environment"
-            }
-
-          },
-
-          audio: false
-
-        });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: {
+          ideal: "environment"
+        }
+      },
+      audio: false
+    });
 
 
-    video.srcObject =
-      stream;
-
+    video.srcObject = stream;
 
     await video.play();
 
 
-    canvas.width =
-      video.videoWidth;
-
-    canvas.height =
-      video.videoHeight;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
 
-    status.innerHTML =
-      "✋ Show your hand to the camera";
+    status.innerHTML = "✋ Show your hand to the camera";
 
 
     detect();
-
 
   }
 
   catch (error) {
 
     console.error(error);
-
 
     status.innerHTML =
       "❌ Please allow camera permission";
@@ -293,22 +193,9 @@ async function startCamera() {
 }
 
 
-/*
-========================================
-DRAW RAKHI
-========================================
-*/
+/* Draw Rakhi */
 
-function drawRakhi(
-  x,
-  y,
-  angle
-) {
-
-
-  /*
-  Clear previous Rakhi
-  */
+function drawRakhi(x, y, angle) {
 
   ctx.clearRect(
     0,
@@ -318,94 +205,57 @@ function drawRakhi(
   );
 
 
-  /*
-  Save canvas position
-  */
-
   ctx.save();
 
 
-  /*
-  Move to wrist
-  */
+  /* Move to wrist */
 
-  ctx.translate(
-    x,
-    y
-  );
+  ctx.translate(x, y);
 
 
   /*
   Rotate with hand
-
-  - Math.PI / 2
-  = rotate Rakhi 90 degrees LEFT
+  + Math.PI = 180 degrees
   */
 
-  ctx.rotate(
-    angle - Math.PI / 2
-  );
+  ctx.rotate(angle + Math.PI);
 
 
-  /*
-  Rakhi size
-  */
+  /* Rakhi size */
 
   const size =
-    Math.min(
-      canvas.width,
-      canvas.height
-    ) * 0.32;
+    Math.min(canvas.width, canvas.height) * 0.32;
 
 
-  /*
-  Draw Rakhi image
-  */
+  /* Draw Rakhi */
 
   ctx.drawImage(
-
     rakhi,
-
     -size / 2,
-
     -size / 2,
-
     size,
-
     size
-
   );
 
-
-  /*
-  Restore canvas
-  */
 
   ctx.restore();
 
 }
 
 
-/*
-========================================
-SETUP MEDIAPIPE HANDS
-========================================
-*/
+/* Setup MediaPipe */
 
-const hands =
-  new Hands({
+const hands = new Hands({
 
-    locateFile: function(file) {
+  locateFile: function(file) {
 
-      return
+    return
+      "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" +
+      file;
 
-        "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" +
+  }
 
-        file;
-
-    }
-
-  });
+});
 
 
 hands.setOptions({
@@ -421,260 +271,147 @@ hands.setOptions({
 });
 
 
-/*
-========================================
-WHEN HAND IS DETECTED
-========================================
-*/
+/* When hand is detected */
 
-hands.onResults(
-  function(results) {
+hands.onResults(function(results) {
 
 
-    /*
-    Clear canvas
-    */
-
-    ctx.clearRect(
-
-      0,
-
-      0,
-
-      canvas.width,
-
-      canvas.height
-
-    );
-
-
-    /*
-    Check if a hand exists
-    */
-
-    if (
-
-      results.multiHandLandmarks &&
-
-      results.multiHandLandmarks.length > 0
-
-    ) {
-
-
-      const hand =
-        results.multiHandLandmarks[0];
-
-
-      /*
-      Landmark 0
-      = wrist
-      */
-
-      const wrist =
-        hand[0];
-
-
-      /*
-      Landmark 9
-      = center of palm
-      */
-
-      const palm =
-        hand[9];
-
-
-      /*
-      Convert wrist
-      to screen coordinates
-      */
-
-      const wristX =
-
-        wrist.x *
-
-        canvas.width;
-
-
-      const wristY =
-
-        wrist.y *
-
-        canvas.height;
-
-
-      /*
-      Palm coordinates
-      */
-
-      const palmX =
-
-        palm.x *
-
-        canvas.width;
-
-
-      const palmY =
-
-        palm.y *
-
-        canvas.height;
-
-
-      /*
-      Calculate hand angle
-      */
-
-      const angle =
-
-        Math.atan2(
-
-          palmY - wristY,
-
-          palmX - wristX
-
-        );
-
-
-      /*
-      Draw Rakhi
-      */
-
-      if (
-
-        rakhi.complete &&
-
-        rakhi.naturalWidth > 0
-
-      ) {
-
-        drawRakhi(
-
-          wristX,
-
-          wristY,
-
-          angle
-
-        );
-
-      }
-
-
-      /*
-      Change the message
-      */
-
-      message.innerHTML =
-
-        "❤️ I'm new to this Rakhi concept,<br>" +
-
-        "but you've been my bro before I knew the concept." +
-
-        "<span class='highlight'>" +
-
-        "🎉 Happy Raksha Bandhan! 🎉" +
-
-        "</span>";
-
-
-      /*
-      Update status
-      */
-
-      status.innerHTML =
-
-        "🎀 Rakhi placed!";
-
-    }
-
-
-    else {
-
-
-      /*
-      No hand detected
-      */
-
-      message.innerHTML =
-
-        "✋ Show me your hand";
-
-
-      status.innerHTML =
-
-        "📷 Looking for your hand...";
-
-    }
-
-  }
-
-);
-
-
-/*
-========================================
-DETECTION LOOP
-========================================
-*/
-
-async function detect() {
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
 
 
   if (
-
-    video.readyState >= 2
-
+    results.multiHandLandmarks &&
+    results.multiHandLandmarks.length > 0
   ) {
 
+    const hand =
+      results.multiHandLandmarks[0];
+
+
+    /* Wrist */
+
+    const wrist =
+      hand[0];
+
+
+    /* Palm */
+
+    const palm =
+      hand[9];
+
+
+    /* Convert wrist coordinates */
+
+    const wristX =
+      wrist.x * canvas.width;
+
+    const wristY =
+      wrist.y * canvas.height;
+
+
+    /* Convert palm coordinates */
+
+    const palmX =
+      palm.x * canvas.width;
+
+    const palmY =
+      palm.y * canvas.height;
+
+
+    /* Calculate hand direction */
+
+    const angle =
+      Math.atan2(
+        palmY - wristY,
+        palmX - wristX
+      );
+
+
+    /* Draw Rakhi */
+
+    if (
+      rakhi.complete &&
+      rakhi.naturalWidth > 0
+    ) {
+
+      drawRakhi(
+        wristX,
+        wristY,
+        angle
+      );
+
+    }
+
+
+    /* Display greeting */
+
+    message.innerHTML =
+      "❤️ I'm new to this Rakhi concept,<br>" +
+      "but you've been my bro before I knew the concept." +
+      "<span class='highlight'>" +
+      "🎉 Happy Raksha Bandhan! 🎉" +
+      "</span>";
+
+
+    status.innerHTML =
+      "🎀 Rakhi placed!";
+
+  }
+
+  else {
+
+    /* No hand detected */
+
+    message.innerHTML =
+      "✋ Show me your hand";
+
+
+    status.innerHTML =
+      "📷 Looking for your hand...";
+
+  }
+
+});
+
+
+/* Detection loop */
+
+async function detect() {
+
+  if (video.readyState >= 2) {
 
     await hands.send({
-
       image: video
-
     });
 
   }
 
-
-  requestAnimationFrame(
-    detect
-  );
+  requestAnimationFrame(detect);
 
 }
 
 
-/*
-========================================
-START APP
-========================================
-*/
+/* Start application */
 
 startCamera();
 
 
-/*
-========================================
-HANDLE SCREEN RESIZE
-========================================
-*/
+/* Adjust canvas if screen changes */
 
-window.addEventListener(
-  "resize",
+window.addEventListener("resize", function() {
 
-  function() {
+  canvas.width =
+    video.videoWidth;
 
+  canvas.height =
+    video.videoHeight;
 
-    canvas.width =
-      video.videoWidth;
-
-
-    canvas.height =
-      video.videoHeight;
-
-  }
-
-);
-
+});
 
 </script>
 
