@@ -10,7 +10,7 @@
   body {
     margin: 0;
     background: black;
-    font-family: Arial, sans-serif;
+    font-family: Georgia, "Times New Roman", serif;
     overflow: hidden;
   }
 
@@ -32,47 +32,88 @@
     pointer-events: none;
   }
 
+  /* Elegant message card */
+
   #message {
     position: fixed;
+
     top: 30px;
     left: 50%;
+
     transform: translateX(-50%);
 
-    width: 90%;
-    max-width: 700px;
+    width: 88%;
+    max-width: 720px;
 
     text-align: center;
 
-    padding: 16px 20px;
+    padding: 20px 25px;
 
-    border-radius: 20px;
+    border-radius: 18px;
 
-    background: rgba(45, 0, 45, 0.75);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(40, 5, 25, 0.88),
+        rgba(95, 15, 45, 0.82)
+      );
 
-    color: white;
+    border:
+      1px solid
+      rgba(255, 215, 0, 0.7);
 
-    font-size: clamp(20px, 5vw, 30px);
-    font-weight: bold;
+    color: #fff8e7;
 
-    line-height: 1.4;
+    font-size:
+      clamp(19px, 4vw, 28px);
 
-    text-shadow: 2px 2px 5px black;
+    font-weight: 500;
+
+    line-height: 1.55;
+
+    letter-spacing: 0.3px;
+
+    text-shadow:
+      1px 2px 5px
+      rgba(0, 0, 0, 0.8);
+
+    box-shadow:
+      0 8px 30px
+      rgba(0, 0, 0, 0.5);
 
     z-index: 10;
+
+    transition: all 0.4s ease;
   }
+
+  /* Final greeting */
 
   .highlight {
     display: block;
-    margin-top: 8px;
 
-    color: #ffd700;
+    margin-top: 12px;
+
+    padding-top: 10px;
+
+    border-top:
+      1px solid
+      rgba(255, 215, 0, 0.45);
+
+    color: #ffd66b;
 
     font-size: 1.2em;
 
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
     text-shadow:
-      0 0 10px #ff0000,
-      0 0 20px #ff9900;
+      0 0 12px
+      rgba(255, 190, 50, 0.5);
   }
+
+
+  /* Start button */
 
   #startButton {
     position: fixed;
@@ -80,24 +121,53 @@
     top: 50%;
     left: 50%;
 
-    transform: translate(-50%, -50%);
+    transform:
+      translate(-50%, -50%);
 
     z-index: 100;
 
-    padding: 18px 35px;
+    padding:
+      16px 34px;
 
-    border: none;
+    border:
+      1px solid
+      rgba(255, 215, 0, 0.8);
+
     border-radius: 30px;
 
-    background: #ffd700;
+    background:
+      linear-gradient(
+        135deg,
+        #6b1238,
+        #3d071f
+      );
 
-    color: #4a0030;
+    color: #ffe8a3;
 
-    font-size: 20px;
-    font-weight: bold;
+    font-family:
+      Georgia,
+      "Times New Roman",
+      serif;
+
+    font-size: 19px;
+
+    letter-spacing: 0.8px;
 
     cursor: pointer;
+
+    box-shadow:
+      0 5px 25px
+      rgba(0, 0, 0, 0.6);
   }
+
+  #startButton:active {
+    transform:
+      translate(-50%, -50%)
+      scale(0.97);
+  }
+
+
+  /* Bottom status */
 
   #status {
     position: fixed;
@@ -105,37 +175,57 @@
     bottom: 25px;
     left: 50%;
 
-    transform: translateX(-50%);
+    transform:
+      translateX(-50%);
 
-    background: rgba(0, 0, 0, 0.65);
+    background:
+      rgba(0, 0, 0, 0.65);
 
-    color: white;
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.15);
 
-    padding: 10px 20px;
+    color: #f5e7d0;
+
+    padding:
+      10px 22px;
 
     border-radius: 30px;
 
-    font-size: 16px;
+    font-size: 15px;
 
     z-index: 10;
+
+    white-space: nowrap;
+
+    letter-spacing: 0.4px;
   }
+
 </style>
 
 </head>
 
 <body>
 
+<!-- Main message -->
+
 <div id="message">
-  ✋ Show me your hand
+  Show me your hand
 </div>
 
+<!-- Start camera button -->
+
 <button id="startButton">
-  📷 Start Camera
+  Start Camera
 </button>
+
+<!-- Status -->
 
 <div id="status">
   Tap Start Camera to begin
 </div>
+
+<!-- Camera -->
 
 <video
 id="camera"
@@ -143,11 +233,15 @@ autoplay
 playsinline
 muted> </video>
 
+<!-- Rakhi overlay -->
+
 <canvas id="canvas"></canvas>
 
 <!-- MediaPipe Hands -->
 
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script
+src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js">
+</script>
 
 <script>
 
@@ -171,7 +265,6 @@ const startButton =
   document.getElementById("startButton");
 
 
-
 /*
 LOAD RAKHI IMAGE
 */
@@ -181,7 +274,6 @@ const rakhi =
 
 rakhi.src =
   "rakhi.png";
-
 
 
 /*
@@ -208,7 +300,6 @@ hands.setOptions({
   minTrackingConfidence: 0.6
 
 });
-
 
 
 /*
@@ -239,17 +330,12 @@ hands.onResults(results => {
       results.multiHandLandmarks[0];
 
 
-    // Wrist
-
     const wrist =
       hand[0];
 
 
-    // Palm
-
     const palm =
       hand[9];
-
 
 
     const wristX =
@@ -259,13 +345,11 @@ hands.onResults(results => {
       wrist.y * canvas.height;
 
 
-
     const palmX =
       palm.x * canvas.width;
 
     const palmY =
       palm.y * canvas.height;
-
 
 
     /*
@@ -280,7 +364,6 @@ hands.onResults(results => {
         palmX - wristX
 
       );
-
 
 
     /*
@@ -341,26 +424,25 @@ hands.onResults(results => {
     }
 
 
-
     /*
     SHOW GREETING
     */
 
     message.innerHTML =
 
-      "❤️ I'm new to this Rakhi concept,<br>" +
+      "I'm new to this Rakhi concept,<br>" +
 
       "but you've been my bro before I knew the concept." +
 
       "<span class='highlight'>" +
 
-      "🎉 Happy Raksha Bandhan! 🎉" +
+      "Happy Raksha Bandhan ♥" +
 
       "</span>";
 
 
     status.innerHTML =
-      "🎀 Rakhi placed!";
+      "Rakhi placed";
 
   }
 
@@ -369,16 +451,15 @@ hands.onResults(results => {
 
 
     message.innerHTML =
-      "✋ Show me your hand";
+      "Show me your hand";
 
 
     status.innerHTML =
-      "📷 Looking for your hand...";
+      "Looking for your hand...";
 
   }
 
 });
-
 
 
 /*
@@ -408,10 +489,9 @@ async function detect() {
 }
 
 
-
 /*
-START CAMERA ONLY AFTER
-USER CLICKS THE BUTTON
+START CAMERA AFTER USER
+CLICKS THE BUTTON
 */
 
 startButton.addEventListener(
@@ -423,9 +503,7 @@ startButton.addEventListener(
 
 
       /*
-      THIS TRIGGERS THE
-      BROWSER CAMERA PERMISSION
-      POPUP
+      REQUEST CAMERA PERMISSION
       */
 
       const stream =
@@ -444,13 +522,11 @@ startButton.addEventListener(
         });
 
 
-
       video.srcObject =
         stream;
 
 
       await video.play();
-
 
 
       canvas.width =
@@ -460,10 +536,8 @@ startButton.addEventListener(
         video.videoHeight;
 
 
-
       /*
-      HIDE BUTTON AFTER
-      CAMERA STARTS
+      HIDE START BUTTON
       */
 
       startButton.style.display =
@@ -471,12 +545,11 @@ startButton.addEventListener(
 
 
       status.innerHTML =
-        "✋ Show your hand";
-
+        "Show your hand";
 
 
       /*
-      START HAND DETECTION
+      START DETECTION
       */
 
       detect();
@@ -491,7 +564,7 @@ startButton.addEventListener(
 
 
       status.innerHTML =
-        "❌ Camera permission was denied";
+        "Camera permission was denied";
 
     }
 
