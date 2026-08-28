@@ -3,7 +3,6 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Virtual Rakhi</title>
 
 <style>
@@ -25,10 +24,8 @@
     position: fixed;
     top: 0;
     left: 0;
-
     width: 100vw;
     height: 100vh;
-
     pointer-events: none;
   }
 
@@ -36,80 +33,60 @@
 
   #message {
     position: fixed;
-
-    top: 30px;
+    top: 25px;
     left: 50%;
-
     transform: translateX(-50%);
 
     width: 88%;
-    max-width: 720px;
+    max-width: 680px;
 
     text-align: center;
-
-    padding: 20px 25px;
+    padding: 16px 22px;
 
     border-radius: 18px;
 
-    background:
-      linear-gradient(
-        135deg,
-        rgba(40, 5, 25, 0.88),
-        rgba(95, 15, 45, 0.82)
-      );
+    background: linear-gradient(
+      135deg,
+      rgba(40, 5, 25, 0.88),
+      rgba(95, 15, 45, 0.82)
+    );
 
-    border:
-      1px solid
-      rgba(255, 215, 0, 0.7);
+    border: 1px solid rgba(255, 215, 0, 0.7);
 
     color: #fff8e7;
 
-    font-size:
-      clamp(19px, 4vw, 28px);
+    /* Slightly smaller text */
+    font-size: clamp(16px, 3.8vw, 23px);
 
     font-weight: 500;
-
-    line-height: 1.55;
-
-    letter-spacing: 0.3px;
+    line-height: 1.5;
+    letter-spacing: 0.2px;
 
     text-shadow:
-      1px 2px 5px
-      rgba(0, 0, 0, 0.8);
+      1px 2px 5px rgba(0, 0, 0, 0.8);
 
     box-shadow:
-      0 8px 30px
-      rgba(0, 0, 0, 0.5);
+      0 8px 30px rgba(0, 0, 0, 0.5);
 
     z-index: 10;
-
-    transition: all 0.4s ease;
   }
-
-  /* Final greeting */
 
   .highlight {
     display: block;
-
-    margin-top: 12px;
-
-    padding-top: 10px;
+    margin-top: 10px;
+    padding-top: 8px;
 
     border-top:
-      1px solid
-      rgba(255, 215, 0, 0.45);
+      1px solid rgba(255, 215, 0, 0.45);
 
     color: #ffd66b;
 
-    font-size: 1.2em;
-
+    font-size: 1.15em;
     font-weight: bold;
-
-    letter-spacing: 1px;
+    letter-spacing: 0.7px;
 
     text-shadow:
-      0 0 12px
-      rgba(255, 190, 50, 0.5);
+      0 0 12px rgba(255, 190, 50, 0.5);
   }
 
 
@@ -117,47 +94,38 @@
 
   #startButton {
     position: fixed;
-
     top: 50%;
     left: 50%;
 
-    transform:
-      translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 
     z-index: 100;
 
-    padding:
-      16px 34px;
+    padding: 16px 34px;
 
     border:
-      1px solid
-      rgba(255, 215, 0, 0.8);
+      1px solid rgba(255, 215, 0, 0.8);
 
     border-radius: 30px;
 
-    background:
-      linear-gradient(
-        135deg,
-        #6b1238,
-        #3d071f
-      );
+    background: linear-gradient(
+      135deg,
+      #6b1238,
+      #3d071f
+    );
 
     color: #ffe8a3;
 
     font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
+      Georgia, "Times New Roman", serif;
 
     font-size: 19px;
-
     letter-spacing: 0.8px;
 
     cursor: pointer;
 
     box-shadow:
-      0 5px 25px
-      rgba(0, 0, 0, 0.6);
+      0 5px 25px rgba(0, 0, 0, 0.6);
   }
 
   #startButton:active {
@@ -171,33 +139,27 @@
 
   #status {
     position: fixed;
-
     bottom: 25px;
     left: 50%;
 
-    transform:
-      translateX(-50%);
+    transform: translateX(-50%);
 
-    background:
-      rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.65);
 
     border:
-      1px solid
-      rgba(255, 255, 255, 0.15);
+      1px solid rgba(255, 255, 255, 0.15);
 
     color: #f5e7d0;
 
-    padding:
-      10px 22px;
+    padding: 10px 22px;
 
     border-radius: 30px;
 
-    font-size: 15px;
+    font-size: 14px;
 
     z-index: 10;
 
     white-space: nowrap;
-
     letter-spacing: 0.4px;
   }
 
@@ -207,25 +169,17 @@
 
 <body>
 
-<!-- Main message -->
-
 <div id="message">
   Show me your hand
 </div>
-
-<!-- Start camera button -->
 
 <button id="startButton">
   Start Camera
 </button>
 
-<!-- Status -->
-
 <div id="status">
   Tap Start Camera to begin
 </div>
-
-<!-- Camera -->
 
 <video
 id="camera"
@@ -233,60 +187,37 @@ autoplay
 playsinline
 muted> </video>
 
-<!-- Rakhi overlay -->
-
 <canvas id="canvas"></canvas>
 
 <!-- MediaPipe Hands -->
 
-<script
-src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 
 <script>
 
+const video = document.getElementById("camera");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-const video =
-  document.getElementById("camera");
-
-const canvas =
-  document.getElementById("canvas");
-
-const ctx =
-  canvas.getContext("2d");
-
-const message =
-  document.getElementById("message");
-
-const status =
-  document.getElementById("status");
-
-const startButton =
-  document.getElementById("startButton");
+const message = document.getElementById("message");
+const status = document.getElementById("status");
+const startButton = document.getElementById("startButton");
 
 
-/*
-LOAD RAKHI IMAGE
-*/
+/* Load Rakhi image */
 
-const rakhi =
-  new Image();
-
-rakhi.src =
-  "rakhi.png";
+const rakhi = new Image();
+rakhi.src = "rakhi.png";
 
 
-/*
-MEDIAPIPE HAND DETECTION
-*/
+/* Create MediaPipe hand detector */
 
-const hands =
-  new Hands({
+const hands = new Hands({
 
-    locateFile: file =>
-      "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" + file
+  locateFile: file =>
+    "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" + file
 
-  });
+});
 
 
 hands.setOptions({
@@ -302,12 +233,12 @@ hands.setOptions({
 });
 
 
-/*
-WHEN HAND IS DETECTED
-*/
+/* Process hand detection results */
 
 hands.onResults(results => {
 
+
+  /* Clear previous Rakhi */
 
   ctx.clearRect(
     0,
@@ -317,12 +248,11 @@ hands.onResults(results => {
   );
 
 
+  /* Check if a hand was found */
+
   if (
-
     results.multiHandLandmarks &&
-
     results.multiHandLandmarks.length > 0
-
   ) {
 
 
@@ -330,13 +260,14 @@ hands.onResults(results => {
       results.multiHandLandmarks[0];
 
 
-    const wrist =
-      hand[0];
+    /* Landmark 0 = wrist */
+    const wrist = hand[0];
+
+    /* Landmark 9 = middle of palm */
+    const palm = hand[9];
 
 
-    const palm =
-      hand[9];
-
+    /* Convert coordinates */
 
     const wristX =
       wrist.x * canvas.width;
@@ -352,35 +283,27 @@ hands.onResults(results => {
       palm.y * canvas.height;
 
 
-    /*
-    Calculate hand direction
-    */
+    /* Calculate hand angle */
 
     const angle =
       Math.atan2(
-
         palmY - wristY,
-
         palmX - wristX
-
       );
 
 
-    /*
-    DRAW RAKHI
-    */
+    /* Draw Rakhi */
 
     if (
-
       rakhi.complete &&
-
       rakhi.naturalWidth > 0
-
     ) {
 
 
       ctx.save();
 
+
+      /* Move drawing to wrist */
 
       ctx.translate(
         wristX,
@@ -389,13 +312,16 @@ hands.onResults(results => {
 
 
       /*
-      180 DEGREE ROTATION
+      Rotate with hand
+      + Math.PI = 180 degrees
       */
 
       ctx.rotate(
         angle + Math.PI
       );
 
+
+      /* Rakhi size */
 
       const size =
         Math.min(
@@ -404,18 +330,14 @@ hands.onResults(results => {
         ) * 0.3;
 
 
+      /* Draw image */
+
       ctx.drawImage(
-
         rakhi,
-
         -size / 2,
-
         -size / 2,
-
         size,
-
         size
-
       );
 
 
@@ -424,29 +346,28 @@ hands.onResults(results => {
     }
 
 
-    /*
-    SHOW GREETING
-    */
+    /* HAND FOUND — show greeting */
 
     message.innerHTML =
-
       "I'm new to this Rakhi concept,<br>" +
-
       "but you've been my bro before I knew the concept." +
-
       "<span class='highlight'>" +
-
       "Happy Raksha Bandhan ♥" +
-
       "</span>";
 
+
+    /* IMPORTANT: Update status when hand is found */
+
+    status.innerHTML =
+      "Rakhi tied :)";
 
 
   }
 
-
   else {
 
+
+    /* NO HAND FOUND */
 
     message.innerHTML =
       "Show me your hand";
@@ -461,36 +382,42 @@ hands.onResults(results => {
 
 
 /*
-HAND DETECTION LOOP
+  Hand detection loop.
+
+  setTimeout prevents multiple
+  detection requests from overlapping.
 */
 
 async function detect() {
 
+  if (video.readyState >= 2) {
 
-  if (
-    video.readyState >= 2
-  ) {
+    try {
 
-    await hands.send({
+      await hands.send({
+        image: video
+      });
 
-      image: video
+    }
 
-    });
+    catch (error) {
+
+      console.error(error);
+
+    }
 
   }
 
 
-  requestAnimationFrame(
-    detect
+  setTimeout(
+    detect,
+    30
   );
 
 }
 
 
-/*
-START CAMERA AFTER USER
-CLICKS THE BUTTON
-*/
+/* Start camera after button click */
 
 startButton.addEventListener(
   "click",
@@ -499,10 +426,9 @@ startButton.addEventListener(
 
     try {
 
+      status.innerHTML =
+        "Requesting camera permission...";
 
-      /*
-      REQUEST CAMERA PERMISSION
-      */
 
       const stream =
         await navigator.mediaDevices.getUserMedia({
@@ -527,6 +453,11 @@ startButton.addEventListener(
       await video.play();
 
 
+      /*
+      Use actual video dimensions
+      so Rakhi aligns correctly.
+      */
+
       canvas.width =
         video.videoWidth;
 
@@ -534,29 +465,23 @@ startButton.addEventListener(
         video.videoHeight;
 
 
-      /*
-      HIDE START BUTTON
-      */
+      /* Hide button */
 
       startButton.style.display =
         "none";
 
 
       status.innerHTML =
-        "Show your hand";
+        "Show me your hand";
 
 
-      /*
-      START DETECTION
-      */
+      /* Start detection */
 
       detect();
-
 
     }
 
     catch (error) {
-
 
       console.error(error);
 
@@ -569,7 +494,6 @@ startButton.addEventListener(
   }
 
 );
-
 
 </script>
 
